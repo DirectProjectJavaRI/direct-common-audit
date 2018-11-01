@@ -38,16 +38,8 @@
   <parent>
 	   <groupId>org.springframework.boot</groupId>
 	   <artifactId>spring-boot-dependencies</artifactId>
-	   <version>2.1.0.RC1</version>
-  </parent>	   
-	<repositories>
-	    <!-- Temp repository for Spring Boot Milestone -->
-        <repository>
-            <id>spring-milestone</id>
-            <name>Spring Milestone Releases</name>
-            <url>https://repo.spring.io/milestone/</url>
-        </repository>
-     </repositories>      
+	   <version>2.1.0.RELEASE</version>
+  </parent>	     
   <dependencies>    
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
