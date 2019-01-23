@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>direct-common-audit</artifactId>    
     <name>Direct Project auditing interfaces and implementations</name>
-    <version>6.0</version>
+    <version>6.1-SNAPSHOT</version>
     <description>Direct Project auditing interfaces and implementations</description>
     <inceptionYear>2010</inceptionYear>
     <url>http://api.nhindirect.org/x/www/api.nhindirect.org/java/site/direct-common-audit/${project.version}</url> 
@@ -217,8 +217,7 @@
                 </goals>
             </execution>
         </executions>		        
-     </plugin>  
-         <!--  for releases only	     
+     </plugin>       
 	     <plugin>
              <groupId>org.apache.maven.plugins</groupId>
              <artifactId>maven-gpg-plugin</artifactId>
@@ -231,8 +230,7 @@
                      </goals>
               </execution>
             </executions>
-        </plugin>	    
-         -->      			    
+        </plugin>	       			    
     </plugins>    
   </build>                        
   <reporting>
