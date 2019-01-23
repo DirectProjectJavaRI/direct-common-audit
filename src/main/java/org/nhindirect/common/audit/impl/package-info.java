@@ -20,7 +20,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /**
- * Database backed auditing implementation
+ * Multiple auditing implementations.  This includes file, logging, and database backed implementations.
  */
 
 package org.nhindirect.common.audit.impl;

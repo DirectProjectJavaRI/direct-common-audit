@@ -6,6 +6,28 @@
         Greg Meyer
         ---
 
+{6.0}
+
+    Changes included with release 6.0
+    
+    []
+    
+    Enhancements
+    
+ 	* Requires Java 8
+ 	
+ 	* Incorporation/Upgrade to Spring 5 and SpringBoot 2.1
+    
+    * Removal of Google Guice IoC framework
+    
+    * Refactored auditing base classes and interfaces to be move from direct-common to this library.
+
+    [] 
+     
+    Bug Fixes
+
+    * NA
+
 {1.0}
 
     Changes included with release 1.0
