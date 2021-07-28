@@ -25,11 +25,11 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.UUID;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.nhindirect.common.audit.AuditContext;
 import org.nhindirect.common.audit.AuditEvent;
 import org.nhindirect.common.audit.Auditor;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * {@link Auditor} implementation that utilizes the Apache Commons logging framework as the storage medium for auditing events.  Audit events are distinguished
@@ -37,6 +37,7 @@ import org.nhindirect.common.audit.Auditor;
  * @author Greg Meyer
  * @since 1.0
  */
+@Slf4j
 public class LoggingAuditor extends AbstractAuditor 
 {
 	private static final String EVENT_TAG = "[DIRECT AUDIT EVENT]";
@@ -45,9 +46,6 @@ public class LoggingAuditor extends AbstractAuditor
 	private static final String EVENT_NAME = "EVENT CATEGORY";
 	private static final String EVENT_TYPE = "EVENT MESSAGE";
 	private static final String EVENT_CTX = "EVENT CONTEXTS";	
-	
-	@SuppressWarnings("deprecation")
-	private final Log writer = LogFactory.getFactory().getInstance(LoggingAuditor.class);
 
 	/**
 	 * Default constructor
@@ -63,7 +61,7 @@ public class LoggingAuditor extends AbstractAuditor
 	@Override
 	public void writeEvent(UUID eventId, Calendar eventTimeStamp, String principal, AuditEvent event, Collection<? extends AuditContext> contexts)
 	{		
-		writer.info(buildEventString(eventId, principal, event, contexts));		
+		log.info(buildEventString(eventId, principal, event, contexts));		
 	}
 
 	/*

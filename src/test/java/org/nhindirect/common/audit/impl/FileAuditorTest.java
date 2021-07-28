@@ -1,11 +1,14 @@
 package org.nhindirect.common.audit.impl;
 
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -17,8 +20,6 @@ import java.util.UUID;
 import javax.management.openmbean.CompositeData;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.Test;
 import org.nhindirect.common.audit.AuditContext;
 import org.nhindirect.common.audit.AuditEvent;
 import org.nhindirect.common.audit.DefaultAuditContext;
@@ -33,7 +34,7 @@ public class FileAuditorTest
 	private static File auditFile;
 	
 
-	@Before
+	@BeforeEach
 	public void setup()
 	{
 		auditFile = new File("target" + fileSep + "testAuditFile.txt");
@@ -45,49 +46,28 @@ public class FileAuditorTest
 	@Test
 	public void testCreateAuditor_NullFile_AssertException()
 	{
-		boolean exceptionOccured = false;
-		try
+		Assertions.assertThrows(IllegalArgumentException.class, () ->
 		{
 			new FileAuditor(null);
-		}
-		catch (IllegalArgumentException e)
-		{
-			exceptionOccured = true;
-		}
-		
-		assertTrue(exceptionOccured);
+		});
 	}
 
 	@Test
 	public void testCreateAuditor_IllegalFileName_AssertException()
 	{
-		boolean exceptionOccured = false;
-		try
+		Assertions.assertThrows(IllegalArgumentException.class, () ->
 		{
 			new FileAuditor(new File(".."));
-		}
-		catch (IllegalArgumentException e)
-		{
-			exceptionOccured = true;
-		}
-		
-		assertTrue(exceptionOccured);
+		});
 	}
 
 	@Test
 	public void testCreateAuditor_IllegalFileName2_AssertException()
 	{
-		boolean exceptionOccured = false;
-		try
+		Assertions.assertThrows(IllegalArgumentException.class, () ->
 		{
 			new FileAuditor(new File("!-@$*?\n\r/\0"));
-		}
-		catch (IllegalArgumentException e)
-		{
-			exceptionOccured = true;
-		}
-		
-		assertTrue(exceptionOccured);
+		});
 	}
 	
 	@Test
@@ -102,17 +82,10 @@ public class FileAuditorTest
 	{
 		FileAuditor auditor = new FileAuditor(auditFile);
 		
-		boolean exceptionOccured = false;
-		try
+		Assertions.assertThrows(IllegalArgumentException.class, () ->
 		{
 			auditor.audit("", UNIT_TEST_EVENT);
-		}
-		catch (IllegalArgumentException e)
-		{
-			exceptionOccured = true;
-		}
-		
-		assertTrue(exceptionOccured);
+		});
 	}	
 	
 	@Test
@@ -120,17 +93,10 @@ public class FileAuditorTest
 	{
 		FileAuditor auditor = new FileAuditor(auditFile);
 		
-		boolean exceptionOccured = false;
-		try
+		Assertions.assertThrows(IllegalArgumentException.class, () ->
 		{
 			auditor.audit(null, UNIT_TEST_EVENT);
-		}
-		catch (IllegalArgumentException e)
-		{
-			exceptionOccured = true;
-		}
-		
-		assertTrue(exceptionOccured);
+		});
 	}	
 	
 	@Test
@@ -138,17 +104,10 @@ public class FileAuditorTest
 	{
 		FileAuditor auditor = new FileAuditor(auditFile);
 		
-		boolean exceptionOccured = false;
-		try
+		Assertions.assertThrows(IllegalArgumentException.class, () ->
 		{
 			auditor.audit(PRINCIPAL, null);
-		}
-		catch (IllegalArgumentException e)
-		{
-			exceptionOccured = true;
-		}
-		
-		assertTrue(exceptionOccured);
+		});
 	}		
 	
 	

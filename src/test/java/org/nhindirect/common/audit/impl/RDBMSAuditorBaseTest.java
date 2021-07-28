@@ -1,42 +1,46 @@
 package org.nhindirect.common.audit.impl;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.BeforeEach;
 
 
-import org.junit.Before;
-import org.junit.runner.RunWith;
-import org.nhindirect.common.audit.JPATestConfiguration;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.nhindirect.common.audit.R2DBCTestConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@RunWith(SpringRunner.class)
-@DataJpaTest
-@Transactional
-@ContextConfiguration(classes=JPATestConfiguration.class)
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(classes = R2DBCTestConfiguration.class)
+@TestPropertySource("classpath:bootstrap.properties")
 public abstract class RDBMSAuditorBaseTest 
 {
 	@Autowired
-	protected RDBMSDao auditor;		
+	protected RDBMSAuditEventRepository eventRepo;		
+	
+	@Autowired
+	protected RDBMSAuditContextRepository contextRepo;		
 	
 	protected RDBMSAuditor auditorImpl;
 	
-	@Before
+	@BeforeEach
 	public void setUp()
 	{
 		clearAuditEvent();
 		
 		auditorImpl = new RDBMSAuditor();
-			auditorImpl.setDao(auditor);
+		auditorImpl.setEventRepo(eventRepo);
+		auditorImpl.setContextRepo(contextRepo);
 	}
 	
 	protected void clearAuditEvent()
 	{
-		auditor.rDBMSclear();
+		contextRepo.deleteAll().block();
+		eventRepo.deleteAll().block();
 		
-		assertEquals((Integer)0, auditor.getRDBMSEventCount());
+		assertEquals(0L, eventRepo.count().block());
+		assertEquals(0L, contextRepo.count().block());
 	}
 	
 }

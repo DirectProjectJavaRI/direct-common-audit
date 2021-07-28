@@ -1,11 +1,12 @@
 package org.nhindirect.common.audit.impl;
 
-import static org.junit.Assert.assertTrue;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.junit.Test;
 import org.nhindirect.common.audit.AuditContext;
 import org.nhindirect.common.audit.AuditEvent;
 import org.nhindirect.common.audit.DefaultAuditContext;
@@ -27,17 +28,10 @@ public class NoOpAuditorTest
 	{
 		NoOpAuditor auditor = new NoOpAuditor();
 		
-		boolean exceptionOccured = false;
-		try
+		Assertions.assertThrows(IllegalArgumentException.class, () ->
 		{
 			auditor.audit(null, UNIT_TEST_EVENT);
-		}
-		catch (IllegalArgumentException e)
-		{
-			exceptionOccured = true;
-		}
-		
-		assertTrue(exceptionOccured);
+		});
 	}	
 	
 	@Test
@@ -45,17 +39,10 @@ public class NoOpAuditorTest
 	{
 		NoOpAuditor auditor = new NoOpAuditor();
 		
-		boolean exceptionOccured = false;
-		try
+		Assertions.assertThrows(IllegalArgumentException.class, () ->
 		{
 			auditor.audit("", UNIT_TEST_EVENT);
-		}
-		catch (IllegalArgumentException e)
-		{
-			exceptionOccured = true;
-		}
-		
-		assertTrue(exceptionOccured);
+		});
 	}	
 	
 	@Test
@@ -63,17 +50,10 @@ public class NoOpAuditorTest
 	{
 		NoOpAuditor auditor = new NoOpAuditor();
 		
-		boolean exceptionOccured = false;
-		try
+		Assertions.assertThrows(IllegalArgumentException.class, () ->
 		{
 			auditor.audit(PRINCIPAL, null);
-		}
-		catch (IllegalArgumentException e)
-		{
-			exceptionOccured = true;
-		}
-		
-		assertTrue(exceptionOccured);
+		});
 	}		
 		
 	

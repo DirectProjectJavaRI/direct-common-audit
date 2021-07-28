@@ -1,11 +1,13 @@
 package org.nhindirect.common.audit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+
+import org.junit.jupiter.api.Test;
 
 public class AuditEventTest 
 {
@@ -37,69 +39,38 @@ public class AuditEventTest
 	@Test
 	public void testConstructAuditEvent_EmptyName_AssertIllgalArgumentException() throws Exception
 	{
-		boolean exceptionOccured = false;
-		
-		try
+		Assertions.assertThrows(IllegalArgumentException.class, () ->
 		{
 			new AuditEvent("", "value");
-		}
-		catch (IllegalArgumentException e)
-		{
-			exceptionOccured = true;
-		}
-		
-		assertTrue(exceptionOccured);
+		});
 	}	
 	
 	@Test
 	public void testConstructAuditEvent_NullName_AssertIllgalArgumentException() throws Exception
 	{
-		boolean exceptionOccured = false;
-		
-		try
+		Assertions.assertThrows(IllegalArgumentException.class, () ->
 		{
 			new AuditEvent(null, "value");
-		}
-		catch (IllegalArgumentException e)
-		{
-			exceptionOccured = true;
-		}
-		
-		assertTrue(exceptionOccured);
+		});
 	}	
 	
 	@Test
 	public void testConstructAuditEvent_NullType_AssertIllgalArgumentException() throws Exception
 	{
-		boolean exceptionOccured = false;
-		
-		try
+		Assertions.assertThrows(IllegalArgumentException.class, () ->
 		{
 			new AuditEvent("category", null);
-		}
-		catch (IllegalArgumentException e)
-		{
-			exceptionOccured = true;
-		}
-		
-		assertTrue(exceptionOccured);
+		});
+	
 	}	
 	
 	@Test
 	public void testConstructAuditEvent_EmptyType_AssertIllgalArgumentException() throws Exception
 	{
-		boolean exceptionOccured = false;
-		
-		try
+		Assertions.assertThrows(IllegalArgumentException.class, () ->
 		{
 			new AuditEvent("category", "");
-		}
-		catch (IllegalArgumentException e)
-		{
-			exceptionOccured = true;
-		}
-		
-		assertTrue(exceptionOccured);
+		});
 	}	
 
 	@Test

@@ -48,11 +48,11 @@ import javax.management.openmbean.OpenDataException;
 import javax.management.openmbean.OpenType;
 import javax.management.openmbean.SimpleType;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.nhindirect.common.audit.AuditContext;
 import org.nhindirect.common.audit.AuditEvent;
 import org.nhindirect.common.audit.AuditorMBean;
+
+import lombok.extern.slf4j.Slf4j;
 
 import javax.management.openmbean.ArrayType;
 
@@ -61,11 +61,9 @@ import javax.management.openmbean.ArrayType;
  * @author Greg Meyer
  * @since 1.0
  */
+@Slf4j
 public class FileAuditor extends AbstractAuditor implements AuditorMBean
 {		
-	@SuppressWarnings("deprecation")
-	private static final Log LOGGER = LogFactory.getFactory().getInstance(FileAuditor.class);	
-	
 	/* record meta data goes at the end of each record */
 	private static final short RECORD_METADATA_SIZE = 36; 
 	
@@ -101,11 +99,11 @@ public class FileAuditor extends AbstractAuditor implements AuditorMBean
 		if (auditFile == null)
 			throw new IllegalArgumentException("Audit file cannot be null.");
 		
-		LOGGER.info("Instantiating FileAuditor");
+		log.info("Instantiating FileAuditor");
 		
 		if (!auditFile.exists())
 		{
-			LOGGER.info("Audit file does not exist.  Creating new file " + auditFile.getAbsolutePath());
+			log.info("Audit file does not exist.  Creating new file {}", auditFile.getAbsolutePath());
 			try
 			{
 				if (!auditFile.createNewFile())
@@ -117,7 +115,7 @@ public class FileAuditor extends AbstractAuditor implements AuditorMBean
 			}
 		}
 		else
-			LOGGER.info("Found existing audit file " + auditFile.getAbsolutePath() + "   Opening in read/write mode.");
+			log.info("Found existing audit file {} Opening in read/write mode.", auditFile.getAbsolutePath());
 		
 		try
 		{
@@ -166,7 +164,7 @@ public class FileAuditor extends AbstractAuditor implements AuditorMBean
 						break;							
 					else if (!needsFixing)
 					{
-						LOGGER.warn("Inconsistencies found in audit file.  Attempting to fix issues.  Some data may be lost."); 
+						log.warn("Inconsistencies found in audit file.  Attempting to fix issues.  Some data may be lost."); 
 						needsFixing = true;
 					}
 					
@@ -193,7 +191,7 @@ public class FileAuditor extends AbstractAuditor implements AuditorMBean
 	private void registerMBean()
 	{
 		
-		LOGGER.info("Registering FileAuditor MBean");
+		log.info("Registering FileAuditor MBean");
 		
 		try
 		{
@@ -206,7 +204,7 @@ public class FileAuditor extends AbstractAuditor implements AuditorMBean
 		}
 		catch (OpenDataException e)
 		{
-			LOGGER.error("Failed to create settings composite type: " + e.getLocalizedMessage(), e);
+			log.error("Failed to create settings composite type: {}", e.getLocalizedMessage(), e);
 			return;
 		}
 		
@@ -224,7 +222,7 @@ public class FileAuditor extends AbstractAuditor implements AuditorMBean
 		}
 		catch (JMException e)
 		{
-			LOGGER.error("Unable to register the FileAuditor MBean", e);
+			log.error("Unable to register the FileAuditor MBean", e);
 		}		
 	}
 	
@@ -294,7 +292,7 @@ public class FileAuditor extends AbstractAuditor implements AuditorMBean
 	public void writeEvent(UUID eventId, Calendar eventTimeStamp, String principal, AuditEvent event, Collection<? extends AuditContext> contexts)
 	{
 		///CLOVER:OFF
-		if (LOGGER.isDebugEnabled())
+		if (log.isDebugEnabled())
 		{
 			StringBuilder builder = new StringBuilder("Attempting to write new event to the audit store.");
 			builder.append("\r\n\t Event Id: ").append(eventId.toString());
@@ -302,7 +300,7 @@ public class FileAuditor extends AbstractAuditor implements AuditorMBean
 			builder.append("\r\n\t Event Principal: ").append(principal);
 			builder.append("\r\n\t Event Name: ").append(event.getName());
 			builder.append("\r\n\t Event Type: ").append(event.getType());
-			LOGGER.trace(builder.toString());
+			log.trace(builder.toString());
 		}
 		///CLOVER:ON
 		
@@ -573,14 +571,14 @@ public class FileAuditor extends AbstractAuditor implements AuditorMBean
 					}
 					catch (OpenDataException e)
 					{
-						LOGGER.error("Error create composit data for audit event.", e);
+						log.error("Error create composit data for audit event.", e);
 					}
 				}			
 			}
 		}
 		catch (IOException e)
 		{
-			LOGGER.error("Error reading audit file to create audit event composite data.", e);
+			log.error("Error reading audit file to create audit event composite data.", e);
 		}
 		finally 
 		{

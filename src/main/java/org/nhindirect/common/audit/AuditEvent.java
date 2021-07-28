@@ -21,17 +21,26 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
 package org.nhindirect.common.audit;
 
+import org.apache.commons.lang3.StringUtils;
+
+import lombok.Data;
+import lombok.NonNull;
+
 /**
  * A high level descriptor of an auditable event.  Attributes include a name which describes a high level "category" of the event and a type that further
  * qualifies that the event.
  * @author Greg Meyer
  * @since 1.0
  */
+@Data
 public class AuditEvent 
 {
+	@NonNull
 	private final String name;
-	private final String type;
 	
+	@NonNull
+	private final String type;
+
 	/**
 	 * Constructs an audit event from a name and type.
 	 * @param name The generic name or "category" of the event.  Cannot be null or empty.
@@ -39,64 +48,10 @@ public class AuditEvent
 	 */
 	public AuditEvent(String name, String type)
 	{
-		if (name == null || name.isEmpty())
+		if (StringUtils.isEmpty(name) || StringUtils.isEmpty(type))
 			throw new IllegalArgumentException();
-		
-		if (type == null || type.isEmpty())
-			throw new IllegalArgumentException();		
-		
+
 		this.name = name;
 		this.type = type;
-	}
-	
-	/**
-	 * Gets the name of the event.
-	 * @return The name of the event
-	 */
-	public String getName()
-	{
-		return name;
-	}
-	
-	/**
-	 * Gets the type of the event.
-	 * @return The type of the event
-	 */
-	public String getType()
-	{
-		return type;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override 
-	public String toString()
-	{
-		StringBuilder builder = new StringBuilder("EventName: ");
-		builder.append(name).append("\r\nEvent Type: ").append(type);
-		
-		return builder.toString();
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int hashCode()
-	{
-		return toString().hashCode();
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean equals(Object obj)
-	{
-		if (obj == null || !(obj instanceof AuditEvent))
-			return false;
-		
-		return obj.hashCode() == hashCode();
 	}
 }

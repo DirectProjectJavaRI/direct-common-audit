@@ -21,16 +21,25 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
 package org.nhindirect.common.audit;
 
+import org.apache.commons.lang3.StringUtils;
+
+import lombok.Data;
+import lombok.NonNull;
+
 /**
  * Default implementation of the {@link AuditContext} interface that takes a simple name/value pair.
  * @author Greg Meyer
  * @since 1.0
  */
+@Data
 public class DefaultAuditContext implements AuditContext 
 {
-	private final String name;
-	private final String value;
+	@NonNull
+	private final String contextName;
 	
+	@NonNull
+	private final String contextValue;
+
 	/**
 	 * Constructs an context with a simple name and value.
 	 * @param name The name of the context.
@@ -38,40 +47,11 @@ public class DefaultAuditContext implements AuditContext
 	 */
 	public DefaultAuditContext(String name, String value)
 	{
-		if (name == null || name.isEmpty())
-			throw new IllegalArgumentException("Name cannot be null or empty.");
-		
-		if (value == null)
-			throw new IllegalArgumentException("Name cannot be null");		
-		
-		this.name = name;
-		this.value = value;
-	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String getContextName() 
-	{
-		return name;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */	
-	@Override
-	public String getContextValue() 
-	{
-		return value;
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString()
-	{
-		return name + ":" + value;
+		if (StringUtils.isEmpty(name) || value == null)
+				throw new IllegalArgumentException();	
+		
+		this.contextName = name;
+		this.contextValue = value;
 	}
 }

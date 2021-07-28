@@ -24,11 +24,11 @@ package org.nhindirect.common.audit.impl;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.nhindirect.common.audit.AuditContext;
 import org.nhindirect.common.audit.AuditEvent;
 import org.nhindirect.common.audit.Auditor;
+
+import lombok.extern.slf4j.Slf4j;
 /**
  * {@link Auditor} implementation that wraps multiple auditors.  Each call to audit will result (barring exceptions in the delegated
  * auditor) in the event being committed to each auditor. 
@@ -37,11 +37,9 @@ import org.nhindirect.common.audit.Auditor;
  * @since 1.0
  *
  */
+@Slf4j
 public class MultiProviderAuditor implements Auditor
-{
-	@SuppressWarnings("deprecation")
-	private static final Log LOGGER = LogFactory.getFactory().getInstance(MultiProviderAuditor.class);
-	
+{	
 	private final Collection<? extends Auditor> auditors;
 
 	/**
@@ -85,7 +83,7 @@ public class MultiProviderAuditor implements Auditor
 			}
 			catch (Exception e)
 			{
-				LOGGER.error("Failed to audit event using auditor " + auditor.getClass().getName(), e);
+				log.error("Failed to audit event using auditor " + auditor.getClass().getName(), e);
 			}
 		}	
 	}
