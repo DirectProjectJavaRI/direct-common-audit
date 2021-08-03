@@ -1,15 +1,16 @@
 package org.nhindirect.common.audit.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
 import javax.management.openmbean.CompositeData;
 
-import org.junit.Test;
 import org.nhindirect.common.audit.AuditEvent;
 import org.nhindirect.common.audit.DefaultAuditContext;
 

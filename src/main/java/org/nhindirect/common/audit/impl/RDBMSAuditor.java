@@ -22,8 +22,11 @@ THE POSSIBILITY OF SUCH DAMAGE.
 package org.nhindirect.common.audit.impl;
 
 import java.lang.management.ManagementFactory;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 import java.util.Vector;
 
@@ -39,8 +42,6 @@ import javax.management.openmbean.OpenDataException;
 import javax.management.openmbean.OpenType;
 import javax.management.openmbean.SimpleType;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.nhindirect.common.audit.AbstractAuditor;
 import org.nhindirect.common.audit.AuditContext;
 import org.nhindirect.common.audit.AuditEvent;
@@ -48,22 +49,28 @@ import org.nhindirect.common.audit.AuditorMBean;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
+
 /**
  * Implementation of the DirectProject RI auditor that writes records to a configurable database.
  * Also implements the AuditorMBean interface for management access to audit events.
  * @author Greg Meyer
  * @since 1.0
  */
+@Slf4j
 public class RDBMSAuditor extends AbstractAuditor implements AuditorMBean
 {
-	@SuppressWarnings("deprecation")
-	private final Log LOGGER = LogFactory.getFactory().getInstance(RDBMSAuditor.class);
     
 	private String[] itemNames;
 	private CompositeType eventType;
     
 	@Autowired
-	protected RDBMSDao dao;
+	protected RDBMSAuditEventRepository eventRepo;
+	
+	@Autowired
+	protected RDBMSAuditContextRepository contextRepo;
+	
 	
 	/**
 	 * Constructor
@@ -79,18 +86,24 @@ public class RDBMSAuditor extends AbstractAuditor implements AuditorMBean
 	/**
 	 * Constructor
 	 */
-    public RDBMSAuditor(RDBMSDao dao)
+    public RDBMSAuditor(RDBMSAuditEventRepository eventRepo, RDBMSAuditContextRepository contextRepo)
     {	
     	this();
 		// register the auditor as an MBean
     	
-    	setDao(dao);
+    	setEventRepo(eventRepo);
+    	setContextRepo(contextRepo);
     }
     
     
-    public void setDao(RDBMSDao dao)
+    public void setEventRepo(RDBMSAuditEventRepository eventRepo)
     {
-    	this.dao = dao;
+    	this.eventRepo = eventRepo;
+    }
+    
+    public void setContextRepo(RDBMSAuditContextRepository contextRepo)
+    {
+    	this.contextRepo = contextRepo;
     }
     
 	/*
@@ -99,7 +112,7 @@ public class RDBMSAuditor extends AbstractAuditor implements AuditorMBean
 	private void registerMBean()
 	{
 		
-		LOGGER.info("Registering RDBMSAuditor MBean");
+		log.info("Registering RDBMSAuditor MBean");
 		
 		try
 		{
@@ -112,7 +125,7 @@ public class RDBMSAuditor extends AbstractAuditor implements AuditorMBean
 		}
 		catch (OpenDataException e)
 		{
-			LOGGER.error("Failed to create settings composite type: " + e.getLocalizedMessage(), e);
+			log.error("Failed to create settings composite type: {}",  e.getLocalizedMessage(), e);
 			return;
 		}
 		
@@ -130,7 +143,7 @@ public class RDBMSAuditor extends AbstractAuditor implements AuditorMBean
 		}
 		catch (JMException e)
 		{
-			LOGGER.error("Unable to register the RDBMSAuditors MBean", e);
+			log.error("Unable to register the RDBMSAuditors MBean", e);
 		}		
 	}
 	
@@ -141,7 +154,35 @@ public class RDBMSAuditor extends AbstractAuditor implements AuditorMBean
 	public void writeEvent(UUID eventId, Calendar eventTimeStamp,
 			String principal, AuditEvent event, Collection<? extends AuditContext> contexts) 
 	{
-		this.dao.writeRDBMSEvent(eventId, eventTimeStamp, principal, event, contexts);
+		org.nhindirect.common.audit.impl.entity.AuditEvent newEvent =
+				new org.nhindirect.common.audit.impl.entity.AuditEvent();
+		
+		newEvent.setEventName(event.getName());
+		newEvent.setEventType(event.getType());
+
+		newEvent.setEventTime(LocalDateTime.now());
+		newEvent.setPrincipal(principal);
+		newEvent.setUUID(eventId.toString());
+		
+		newEvent = eventRepo.save(newEvent).block();
+
+		if (contexts != null && !contexts.isEmpty())
+		{
+			final Collection<org.nhindirect.common.audit.impl.entity.AuditContext> entityContexts = new ArrayList<>();
+			for (AuditContext context : contexts)
+			{
+				final org.nhindirect.common.audit.impl.entity.AuditContext newContext = 
+						new org.nhindirect.common.audit.impl.entity.AuditContext();
+				
+				newContext.setContextName(context.getContextName());
+				newContext.setContextValue(context.getContextValue());
+				newContext.setAuditEventId(newEvent.getId());
+				entityContexts.add(newContext);
+			}
+			
+			contextRepo.saveAll(entityContexts).collectList().block();
+		}
+
 	}
 	
 
@@ -151,7 +192,7 @@ public class RDBMSAuditor extends AbstractAuditor implements AuditorMBean
 	@Override
 	public Integer getEventCount() 
 	{
-		return this.dao.getRDBMSEventCount();
+		return eventRepo.count().block().intValue();
 	}
 
 	/**
@@ -165,40 +206,50 @@ public class RDBMSAuditor extends AbstractAuditor implements AuditorMBean
 		
 		final Vector<CompositeData> retVal = new Vector<CompositeData>();
 		
-        final Collection<org.nhindirect.common.audit.impl.entity.AuditEvent> rs = this.dao.getRDBMSEvents(eventCount);
-        if (rs.size() == 0)
-        	return null;
-        
-        for (org.nhindirect.common.audit.impl.entity.AuditEvent event : rs)
-        {
-        	String[] contexts = null;
-        	
-        	if (event.getAuditContexts() != null && !event.getAuditContexts().isEmpty())
-        	{
-        		contexts = new String[event.getAuditContexts().size()];
-        		int idx = 0;
-				for (org.nhindirect.common.audit.impl.entity.AuditContext ctx : event.getAuditContexts())
+		final List<CompositeDataSupport> dataSupports = eventRepo.findAllOrderByEventTimeDesc()
+		.take(eventCount)
+		.flatMap(evt -> 
+		{
+			return contextRepo.findByAuditEventId(evt.getId()).collectList()
+			//.switchIfEmpty(Mono.just(Collections.emptyList()))
+			.flatMap(ctxs -> 
+			{
+				String[] contexts = null;
+				
+				if (!ctxs.isEmpty())
 				{
-					contexts[idx++] = ctx.getContextName() + ":" + ctx.getContextValue();
+	        		contexts = new String[ctxs.size()];
+	        		int idx = 0;
+					for (org.nhindirect.common.audit.impl.entity.AuditContext ctx : ctxs)
+					{
+						contexts[idx++] = ctx.getContextName() + ":" + ctx.getContextValue();
+					}
 				}
-        	}
+				else
+					contexts = new String[] {" "};
 				
-			if (contexts == null)
-				contexts = new String[] {" "};
-
-			try
-			{
-			
-				final Object[] eventValues = {event.getUUID(), event.getEventTime().toString(), event.getPrincipal(), 
-						event.getEventName(), event.getEventType(), contexts};
+				final Object[] eventValues = {evt.getUUID(), evt.getEventTime().toString(), evt.getPrincipal(), 
+						evt.getEventName(), evt.getEventType(), contexts};
 				
-				retVal.add(new CompositeDataSupport(eventType, itemNames, eventValues));
-			}
-			catch (OpenDataException e)
-			{
-				LOGGER.error("Error create composit data for audit event.", e);
-			}
-        }
+				try
+				{
+					return Mono.just(new CompositeDataSupport(eventType, itemNames, eventValues));
+				}
+				catch (Exception e)
+				{
+					log.error("Error create composit data for audit event.", e);
+					return Mono.empty();
+				}
+			});
+		})
+		.collectList().block();
+		
+		
+		if (dataSupports.isEmpty())
+			return null;
+		
+		retVal.addAll(dataSupports);
+		
         
 		return retVal.toArray(new CompositeData[retVal.size()]);
 	}
@@ -211,7 +262,7 @@ public class RDBMSAuditor extends AbstractAuditor implements AuditorMBean
 	{
 		final CompositeData[] events = getEvents(1); 
 
-		if (events == null)
+		if (events == null || events.length == 0)
 			return null;
 		
 		return events[0];
@@ -223,6 +274,8 @@ public class RDBMSAuditor extends AbstractAuditor implements AuditorMBean
 	@Override
 	public void clear() 
 	{
-		this.dao.rDBMSclear();		
+		contextRepo.deleteAll()
+			.then(eventRepo.deleteAll()).block();
+
 	}
 }

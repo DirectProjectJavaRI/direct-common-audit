@@ -21,123 +21,31 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
 package org.nhindirect.common.audit.impl.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import lombok.Data;
 
 /**
  * Audit context data entity.
  * @author Greg Meyer
  * @since 1.0
  */
-@Entity
-@Table(name = "auditcontext")
+@Table("auditcontext")
+@Data
 public class AuditContext 
 {
-	private long id;
+	@Id
+	private Long id;
+	
+	@Column("contextName")
 	private String contextName;
-	private String contextValue;	
-	private AuditEvent auditEvent;
 	
-	public AuditContext()
-	{
-		
-	}
+	@Column("contextValue")
+	private String contextValue;
 	
-    /**
-     * Get the value of id.
-     * 
-     * @return the value of id.
-     */
-    @Id
-    @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    public long getId() 
-    {
-        return id;
-    }
-    
-    /**
-     * Set the value of id.
-     * 
-     * @param id
-     *            The value of id.
-     */
-    public void setId(long id) 
-    {
-        this.id = id;
-    } 
-    
-    /**
-     * Get the value of contextName.
-     * 
-     * @return the value of contextName.
-     */
-    @Column(name = "contextName", unique = false)
-    public String getContextName() 
-    {
-        return contextName;
-    }    
-
-    
-    /**
-     * Gets the value of contextName.
-     * @param contextName Get the value of contextName.
-     */
-    public void setContextName(String contextName)
-    {
-    	this.contextName = contextName;
-    }
-    
-    /**
-     * Get the value of contextValue.
-     * 
-     * @return the value of contextValue.
-     */
-    @Column(name = "contextValue", unique = false)
-    public String getContextValue() 
-    {
-        return contextValue;
-    }    
-
-    
-    /**
-     * Gets the value of contextValue.
-     * @param contextValue Get the value of contextValue.
-     */
-    public void setContextValue(String contextValue)
-    {
-    	this.contextValue = contextValue;
-    }    
-    
-    /**
-     * Get the value of the audit event.
-     * 
-     * @return the value of audit event.
-     */
-    @ManyToOne(optional = false, fetch = FetchType.EAGER)
-    @JoinColumn(name = "auditEventId")
-    public AuditEvent getAuditEvent() 
-    {
-        return auditEvent;
-    }
-
-    /**
-     * Set the value of the audit event.
-     * 
-     * @param trustBundle
-     *            The value of the audit event.
-     */
-    public void setAuditEvent(AuditEvent auditEvent) 
-    {
-        this.auditEvent = auditEvent;
-
-    }    
+	@Column("auditEventId")
+	private Long auditEventId;
+	
 }

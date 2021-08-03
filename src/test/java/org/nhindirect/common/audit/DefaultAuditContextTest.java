@@ -1,10 +1,11 @@
 package org.nhindirect.common.audit;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+
+import org.junit.jupiter.api.Test;
 
 public class DefaultAuditContextTest 
 {
@@ -43,58 +44,28 @@ public class DefaultAuditContextTest
 	@Test
 	public void testConstructAuditContext_EmptyName_AssertIllgalArgumentException() throws Exception
 	{
-		boolean exceptionOccured = false;
-		
-		try
+		Assertions.assertThrows(IllegalArgumentException.class, () ->
 		{
 			new DefaultAuditContext("", "value");
-		}
-		catch (IllegalArgumentException e)
-		{
-			exceptionOccured = true;
-		}
-		
-		assertTrue(exceptionOccured);
+		});
 	}	
 	
 	@Test
 	public void testConstructAuditContext_NullName_AssertIllgalArgumentException() throws Exception
 	{
-		boolean exceptionOccured = false;
-		
-		try
+		Assertions.assertThrows(IllegalArgumentException.class, () ->
 		{
 			new DefaultAuditContext(null, "value");
-		}
-		catch (IllegalArgumentException e)
-		{
-			exceptionOccured = true;
-		}
-		
-		assertTrue(exceptionOccured);
+		});
 	}	
 	
 	@Test
 	public void testConstructAuditContext_NullValue_AssertIllgalArgumentException() throws Exception
 	{
-		boolean exceptionOccured = false;
-		
-		try
+		Assertions.assertThrows(IllegalArgumentException.class, () ->
 		{
 			new DefaultAuditContext("name", null);
-		}
-		catch (IllegalArgumentException e)
-		{
-			exceptionOccured = true;
-		}
-		
-		assertTrue(exceptionOccured);
+		});
 	}		
 	
-	@Test
-	public void testAuditContextToString() throws Exception
-	{
-		DefaultAuditContext context = new DefaultAuditContext("name", "value");
-		assertEquals("name:value", context.toString());
-	}	
 }

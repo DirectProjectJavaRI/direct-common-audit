@@ -26,10 +26,6 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.UUID;
 
-import org.nhindirect.common.audit.AuditContext;
-import org.nhindirect.common.audit.AuditEvent;
-import org.nhindirect.common.audit.Auditor;
-
 /**
  * Abstract base class {@link Auditor} that performs trivial sanity checks such as parameter validation.  All calls are delegated to 
  * {@link #writeEvent(String, Calendar, String, String, Collection) which is implemented by a concrete sub class to commit the event to the
