@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>direct-common-audit</artifactId>    
     <name>Direct Project auditing interfaces and implementations</name>
-    <version>8.0.0</version>
+    <version>8.1.0-SNAPSHOT</version>
     <description>Direct Project auditing interfaces and implementations</description>
     <inceptionYear>2010</inceptionYear>
     <url>http://api.nhindirect.org/x/www/api.nhindirect.org/java/site/direct-common-audit/${project.version}</url> 
