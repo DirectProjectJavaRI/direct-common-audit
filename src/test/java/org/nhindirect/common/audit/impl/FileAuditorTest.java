@@ -184,6 +184,7 @@ public class FileAuditorTest
 	public void testGetEventCount_AssertRecordsExist()
 	{
 		FileAuditor auditor = new FileAuditor(auditFile);
+		auditor.clear();
 		auditor.audit(PRINCIPAL, UNIT_TEST_EVENT);
 		auditor.audit(PRINCIPAL, UNIT_TEST_EVENT);
 
