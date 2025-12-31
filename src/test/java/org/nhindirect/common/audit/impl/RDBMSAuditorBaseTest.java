@@ -8,7 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
 @SpringBootTest(classes = R2DBCTestConfiguration.class)
-@TestPropertySource("classpath:bootstrap.properties")
+@TestPropertySource("classpath:application.properties")
 public abstract class RDBMSAuditorBaseTest 
 {
 	@Autowired
